@@ -26,6 +26,11 @@ def build_parser() -> argparse.ArgumentParser:
     run_parser = subparsers.add_parser("run", help="Run the tracker")
     run_parser.add_argument("--send", action="store_true", help="Send the report by SMTP")
     run_parser.add_argument(
+        "--resend",
+        action="store_true",
+        help="Include papers already sent in this 24-hour window for testing",
+    )
+    run_parser.add_argument(
         "--no-llm",
         action="store_true",
         help="Use the deterministic heuristic without calling OpenRouter",
@@ -92,7 +97,12 @@ def main(argv: list[str] | None = None) -> int:
             email_sender=EmailSender(settings),
         )
         try:
-            report = pipeline.run(send=args.send, now=now, source_names=source_names)
+            report = pipeline.run(
+                send=args.send,
+                resend=args.resend,
+                now=now,
+                source_names=source_names,
+            )
         finally:
             store.close()
             http_client.close()

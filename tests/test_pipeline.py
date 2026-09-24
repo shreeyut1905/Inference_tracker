@@ -57,3 +57,28 @@ def test_pipeline_uses_llm_result_and_respects_confidence(settings):
     assert report.useful_count == 1
     assert report.selected[0].useful_category == "inference_optimization"
     assert sender.sent == []
+
+
+def test_pipeline_resend_includes_reviewed_paper(settings):
+    reviewed = Paper(
+        canonical_id="arxiv:2609.12345",
+        title="Fast Diffusion Inference with KV Cache",
+        abstract="A diffusion model with feature caching.",
+    )
+    with StateStore(str(settings.state_db_path)) as store:
+        store.mark_reviewed([reviewed])
+        pipeline = TrackerPipeline(
+            settings=settings,
+            arxiv_source=Source(),
+            huggingface_source=Source(),
+            classifier=None,
+            store=store,
+            email_sender=Sender(),
+        )
+        report = pipeline.run(
+            send=False,
+            resend=True,
+            now=datetime(2026, 9, 24, 2, 30, tzinfo=timezone.utc),
+            source_names=("arxiv",),
+        )
+    assert report.useful_count == 1

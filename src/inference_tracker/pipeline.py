@@ -78,6 +78,7 @@ class TrackerPipeline:
     def run(
         self,
         send: bool = False,
+        resend: bool = False,
         now: datetime | None = None,
         source_names: Iterable[str] = ("arxiv", "huggingface"),
     ) -> PipelineReport:
@@ -91,7 +92,7 @@ class TrackerPipeline:
         if not papers and errors:
             raise PipelineError("; ".join(errors))
         merged = merge_papers(papers)
-        unreviewed = self.store.filter_unreviewed(merged)
+        unreviewed = merged if resend else self.store.filter_unreviewed(merged)
         candidates: list[Paper] = []
         for paper in unreviewed:
             assessment = assess_paper(paper)

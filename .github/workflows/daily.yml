@@ -10,6 +10,11 @@ on:
         required: true
         default: false
         type: boolean
+      resend:
+        description: Resend papers already sent in the current window for testing
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -52,7 +57,7 @@ jobs:
           RELEVANCE_THRESHOLD: "35"
       - name: Send daily report
         if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.send_email)
-        run: python -m inference_tracker run --send
+        run: python -m inference_tracker run --send ${{ inputs.resend && '--resend' || '' }}
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           OPENROUTER_MODEL: stealth/space-bunny-alpha

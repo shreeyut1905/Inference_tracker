@@ -143,6 +143,8 @@ class OpenRouterClassifier:
                 },
             ],
         }
+        if model == "stealth/space-bunny-alpha":
+            payload["response_format"] = {"type": "json_object"}
         headers = {
             "Authorization": f"Bearer {self.settings.openrouter_api_key}",
             "HTTP-Referer": "https://github.com/",

@@ -39,7 +39,7 @@ jobs:
         run: python -m inference_tracker run --json
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          OPENROUTER_MODEL: google/gemma-4-26b-a4b-it:free
+          OPENROUTER_MODEL: stealth/space-bunny-alpha
           OPENROUTER_FALLBACK_MODELS: liquid/lfm-2.5-2.6b:free,nvidia/nemotron-3.5-lightning:free,qwen/qwen3.8-27b:free
           LLM_ENABLED: "true"
           LLM_FAIL_OPEN: "true"
@@ -55,7 +55,7 @@ jobs:
         run: python -m inference_tracker run --send
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          OPENROUTER_MODEL: google/gemma-4-26b-a4b-it:free
+          OPENROUTER_MODEL: stealth/space-bunny-alpha
           OPENROUTER_FALLBACK_MODELS: liquid/lfm-2.5-2.6b:free,nvidia/nemotron-3.5-lightning:free,qwen/qwen3.8-27b:free
           LLM_ENABLED: "true"
           LLM_FAIL_OPEN: "true"

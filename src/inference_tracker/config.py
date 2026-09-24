@@ -117,7 +117,7 @@ class Settings:
         return cls(
             openrouter_api_key=_env("OPENROUTER_API_KEY") or None,
             openrouter_model=_env(
-                "OPENROUTER_MODEL", "google/gemma-4-26b-a4b-it:free"
+                "OPENROUTER_MODEL", "stealth/space-bunny-alpha"
             ),
             openrouter_fallback_models=_csv_env(
                 "OPENROUTER_FALLBACK_MODELS",

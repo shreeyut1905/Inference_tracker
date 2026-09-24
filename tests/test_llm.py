@@ -59,3 +59,59 @@ def test_openrouter_classifier_uses_configured_model(settings: Settings):
     assert result.useful
     assert requests[0].headers["authorization"] == "Bearer test-key"
     assert json.loads(requests[0].content)["model"] == "google/gemma-4-26b-a4b-it:free"
+
+
+def test_batch_classifier_maps_ids_and_uses_one_request(settings: Settings):
+    configured = settings.with_overrides(
+        openrouter_api_key="test-key",
+        openrouter_model="google/gemma-4-26b-a4b-it:free",
+        openrouter_fallback_models=(),
+        llm_batch_size=5,
+    )
+    requests = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        return httpx.Response(
+            200,
+            json={
+                "choices": [
+                    {
+                        "message": {
+                            "content": (
+                                "I considered these papers. "
+                                '{"papers": ['
+                                '{"id": "arxiv:2", "useful": false, '
+                                '"category": "not_relevant", "confidence": 0.9, '
+                                '"reason": "Not diffusion optimization."},'
+                                '{"id": "arxiv:1", "useful": true, '
+                                '"category": "distillation", "confidence": 0.86, '
+                                '"reason": "Distills a diffusion model.", '
+                                '"matched_topics": ["distillation"]}]}'
+                            )
+                        }
+                    }
+                ]
+            },
+            request=request,
+        )
+
+    client = HttpClient(client=httpx.Client(transport=httpx.MockTransport(handler)))
+    classifier = OpenRouterClassifier(configured, client)
+    results = classifier.classify_many(
+        [
+            Paper(
+                canonical_id="arxiv:1",
+                title="Distilled diffusion",
+                abstract="A diffusion model is distilled.",
+            ),
+            Paper(
+                canonical_id="arxiv:2",
+                title="General image paper",
+                abstract="An image generation benchmark.",
+            ),
+        ]
+    )
+    assert [result.useful for result in results] == [True, False]
+    assert results[0].category == "distillation"
+    assert len(requests) == 1

@@ -172,19 +172,35 @@ class TrackerPipeline:
             ]
         if self.classifier is None:
             raise PipelineError("LLM classification is enabled but no classifier is configured")
-        useful: list[Paper] = []
-        for paper in candidates:
+        batch_method = getattr(self.classifier, "classify_many", None)
+        if callable(batch_method):
             try:
-                result = self.classifier.classify(paper)
-            except (ClassifierError, RuntimeError) as error:
+                results = batch_method(candidates)
+                if not isinstance(results, list) or len(results) != len(candidates):
+                    raise ClassifierError("LLM returned an invalid batch result")
+                for paper, result in zip(candidates, results, strict=True):
+                    _apply_result(paper, result)
+            except (ClassifierError, RuntimeError, TypeError, ValueError) as error:
                 if not self.settings.llm_fail_open:
                     raise PipelineError(f"LLM classification failed: {error}") from error
-                errors.append(f"LLM fallback for {paper.canonical_id}: {error}")
-                result = self._heuristic_result(paper, fallback=True)
-            _apply_result(paper, result)
-            if paper.useful and paper.useful_confidence >= self.settings.llm_min_confidence:
-                useful.append(paper)
-        return useful
+                errors.append(f"LLM fallback for batch: {error}")
+                for paper in candidates:
+                    _apply_result(paper, self._heuristic_result(paper, fallback=True))
+        else:
+            for paper in candidates:
+                try:
+                    result = self.classifier.classify(paper)
+                except (ClassifierError, RuntimeError) as error:
+                    if not self.settings.llm_fail_open:
+                        raise PipelineError(f"LLM classification failed: {error}") from error
+                    errors.append(f"LLM fallback for {paper.canonical_id}: {error}")
+                    result = self._heuristic_result(paper, fallback=True)
+                _apply_result(paper, result)
+        return [
+            paper
+            for paper in candidates
+            if paper.useful and paper.useful_confidence >= self.settings.llm_min_confidence
+        ]
 
     def _apply_heuristic_result(self, paper: Paper) -> bool:
         result = self._heuristic_result(paper, fallback=False)

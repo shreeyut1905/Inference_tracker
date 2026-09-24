@@ -75,7 +75,10 @@ def main(argv: list[str] | None = None) -> int:
         if now is None:
             raise ConfigurationError("--now must be a valid ISO-8601 timestamp")
         source_names = tuple(args.source or ("arxiv", "huggingface"))
-        http_client = HttpClient(user_agent=settings.user_agent)
+        http_client = HttpClient(
+            user_agent=settings.user_agent,
+            retries=max(3, settings.llm_max_retries),
+        )
         classifier = OpenRouterClassifier(settings, http_client) if settings.llm_enabled else None
         arxiv_source = ArxivSource(settings, http_client)
         huggingface_source = HuggingFaceSource(settings, http_client)

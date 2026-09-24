@@ -56,6 +56,8 @@ class Settings:
     llm_enabled: bool
     llm_fail_open: bool
     llm_max_papers: int
+    llm_batch_size: int
+    llm_max_tokens: int
     llm_min_confidence: float
     llm_timeout_seconds: float
     llm_max_retries: int
@@ -97,12 +99,21 @@ class Settings:
         llm_max_papers = _int_env("LLM_MAX_PAPERS", 50)
         if llm_max_papers <= 0:
             raise ConfigurationError("LLM_MAX_PAPERS must be positive")
+        llm_batch_size = _int_env("LLM_BATCH_SIZE", 5)
+        if not 1 <= llm_batch_size <= 20:
+            raise ConfigurationError("LLM_BATCH_SIZE must be between 1 and 20")
+        llm_max_tokens = _int_env("LLM_MAX_TOKENS", 2000)
+        if llm_max_tokens <= 0:
+            raise ConfigurationError("LLM_MAX_TOKENS must be positive")
         llm_min_confidence = _float_env("LLM_MIN_CONFIDENCE", 0.5)
         if not 0 <= llm_min_confidence <= 1:
             raise ConfigurationError("LLM_MIN_CONFIDENCE must be between 0 and 1")
         smtp_port = _int_env("SMTP_PORT", 587)
         if not 1 <= smtp_port <= 65535:
             raise ConfigurationError("SMTP_PORT must be between 1 and 65535")
+        llm_max_retries = _int_env("LLM_MAX_RETRIES", 3)
+        if llm_max_retries < 0:
+            raise ConfigurationError("LLM_MAX_RETRIES cannot be negative")
         return cls(
             openrouter_api_key=_env("OPENROUTER_API_KEY") or None,
             openrouter_model=_env(
@@ -119,9 +130,11 @@ class Settings:
             llm_enabled=_bool_env("LLM_ENABLED", True),
             llm_fail_open=_bool_env("LLM_FAIL_OPEN", False),
             llm_max_papers=llm_max_papers,
+            llm_batch_size=llm_batch_size,
+            llm_max_tokens=llm_max_tokens,
             llm_min_confidence=llm_min_confidence,
             llm_timeout_seconds=_float_env("LLM_TIMEOUT_SECONDS", 45.0),
-            llm_max_retries=_int_env("LLM_MAX_RETRIES", 2),
+            llm_max_retries=llm_max_retries,
             arxiv_api_url=_env("ARXIV_API_URL", "https://export.arxiv.org/api/query"),
             openrouter_api_url=_env(
                 "OPENROUTER_API_URL", "https://openrouter.ai/api/v1/chat/completions"

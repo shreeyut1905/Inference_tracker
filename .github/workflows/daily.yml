@@ -42,8 +42,11 @@ jobs:
           OPENROUTER_MODEL: google/gemma-4-26b-a4b-it:free
           OPENROUTER_FALLBACK_MODELS: liquid/lfm-2.5-2.6b:free,nvidia/nemotron-3.5-lightning:free,qwen/qwen3.8-27b:free
           LLM_ENABLED: "true"
-          LLM_FAIL_OPEN: "false"
+          LLM_FAIL_OPEN: "true"
+          LLM_BATCH_SIZE: "5"
+          LLM_MAX_TOKENS: "2000"
           LLM_MIN_CONFIDENCE: "0.5"
+          LLM_MAX_RETRIES: "3"
           TRACKER_TIMEZONE: Asia/Kolkata
           LOOKBACK_HOURS: "24"
           RELEVANCE_THRESHOLD: "35"
@@ -55,8 +58,11 @@ jobs:
           OPENROUTER_MODEL: google/gemma-4-26b-a4b-it:free
           OPENROUTER_FALLBACK_MODELS: liquid/lfm-2.5-2.6b:free,nvidia/nemotron-3.5-lightning:free,qwen/qwen3.8-27b:free
           LLM_ENABLED: "true"
-          LLM_FAIL_OPEN: "false"
+          LLM_FAIL_OPEN: "true"
+          LLM_BATCH_SIZE: "5"
+          LLM_MAX_TOKENS: "2000"
           LLM_MIN_CONFIDENCE: "0.5"
+          LLM_MAX_RETRIES: "3"
           TRACKER_TIMEZONE: Asia/Kolkata
           LOOKBACK_HOURS: "24"
           RELEVANCE_THRESHOLD: "35"

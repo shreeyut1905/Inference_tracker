@@ -15,6 +15,8 @@ def settings(monkeypatch, tmp_path):
         "LLM_ENABLED",
         "LLM_FAIL_OPEN",
         "LLM_MAX_PAPERS",
+        "LLM_BATCH_SIZE",
+        "LLM_MAX_TOKENS",
         "LLM_MIN_CONFIDENCE",
         "LLM_TIMEOUT_SECONDS",
         "LLM_MAX_RETRIES",

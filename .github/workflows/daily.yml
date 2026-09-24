@@ -1,0 +1,71 @@
+name: Daily diffusion paper tracker
+
+on:
+  schedule:
+    - cron: "30 2 * * *"
+  workflow_dispatch:
+    inputs:
+      send_email:
+        description: Send the classified report by Gmail after LLM screening
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Restore tracker state
+        uses: actions/cache@v4
+        with:
+          path: .tracker-state.sqlite3
+          key: inference-tracker-${{ github.run_id }}
+          restore-keys: |
+            inference-tracker-
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .
+      - name: Preview tracker
+        if: github.event_name == 'workflow_dispatch' && !inputs.send_email
+        run: python -m inference_tracker run --json
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          OPENROUTER_MODEL: google/gemma-4-26b-a4b-it:free
+          OPENROUTER_FALLBACK_MODELS: liquid/lfm-2.5-2.6b:free,nvidia/nemotron-3.5-lightning:free,qwen/qwen3.8-27b:free
+          LLM_ENABLED: "true"
+          LLM_FAIL_OPEN: "false"
+          LLM_MIN_CONFIDENCE: "0.5"
+          TRACKER_TIMEZONE: Asia/Kolkata
+          LOOKBACK_HOURS: "24"
+          RELEVANCE_THRESHOLD: "35"
+      - name: Send daily report
+        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.send_email)
+        run: python -m inference_tracker run --send
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          OPENROUTER_MODEL: google/gemma-4-26b-a4b-it:free
+          OPENROUTER_FALLBACK_MODELS: liquid/lfm-2.5-2.6b:free,nvidia/nemotron-3.5-lightning:free,qwen/qwen3.8-27b:free
+          LLM_ENABLED: "true"
+          LLM_FAIL_OPEN: "false"
+          LLM_MIN_CONFIDENCE: "0.5"
+          TRACKER_TIMEZONE: Asia/Kolkata
+          LOOKBACK_HOURS: "24"
+          RELEVANCE_THRESHOLD: "35"
+          SMTP_HOST: smtp.gmail.com
+          SMTP_PORT: "587"
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          SMTP_SECURITY: starttls
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+          SEND_EMPTY_REPORT: "false"
+          STATE_DB_PATH: .tracker-state.sqlite3

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:arxiv="http://arxiv.org/schemas/atom">
+  <entry>
+    <id>http://arxiv.org/abs/2609.12345v1</id>
+    <published>2026-09-23T12:00:00Z</published>
+    <updated>2026-09-23T12:00:00Z</updated>
+    <title>Fast Diffusion Inference with KV Cache</title>
+    <summary>We accelerate diffusion sampling with a reusable feature cache.</summary>
+    <author><name>Ada Example</name></author>
+    <link href="https://arxiv.org/abs/2609.12345v1" rel="alternate" type="text/html"/>
+    <link title="pdf" href="https://arxiv.org/pdf/2609.12345v1" rel="related" type="application/pdf"/>
+    <arxiv:primary_category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2609.12346v1</id>
+    <published>2026-09-22T13:00:00Z</published>
+    <updated>2026-09-22T13:00:00Z</updated>
+    <title>A General Image Dataset</title>
+    <summary>We collect images for a benchmark.</summary>
+    <author><name>Bob Example</name></author>
+    <link href="https://arxiv.org/abs/2609.12346v1" rel="alternate" type="text/html"/>
+    <arxiv:primary_category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+</feed>

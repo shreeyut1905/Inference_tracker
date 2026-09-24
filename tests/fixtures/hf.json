@@ -1,0 +1,14 @@
+[
+  {
+    "paper": {
+      "id": "2609.12345",
+      "title": "Fast Diffusion Inference with KV Cache",
+      "summary": "We accelerate diffusion sampling with a reusable feature cache.",
+      "publishedAt": "2026-09-23T12:00:00.000Z",
+      "submittedOnDailyAt": "2026-09-24T00:00:00.000Z",
+      "authors": [{"name": "Ada Example"}],
+      "upvotes": 12,
+      "githubRepo": "https://github.com/example/fast-diffusion"
+    }
+  }
+]
